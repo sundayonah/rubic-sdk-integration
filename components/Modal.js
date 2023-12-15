@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { OnChainTrade } from '@/pages/address';
+import { OnChainTrade } from '@/pages/data/onChainTradeData';
 
 const Modal = ({ isClose, isOpen, onTokenSelect }) => {
    const handleTokenClick = (selectedToken) => {

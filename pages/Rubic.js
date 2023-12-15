@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { OnChainTrade } from '@/pages/address';
+import { OnChainTrade } from '@/pages/data/onChainTradeData';
 import Modal from '@/components/Modal';
 
 import {
