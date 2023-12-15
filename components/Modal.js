@@ -1,12 +1,34 @@
-import React, { useEffect } from 'react';
-import { OnChainTrade } from '@/pages/data/onChainTradeData';
+import React, { useEffect, useState } from 'react';
+// import { OnChainTrade } from '@/pages/data/onChainTradeData';
 
 const Modal = ({ isClose, isOpen, onTokenSelect }) => {
+   const [onChainTradeData, setOnChainTradeData] = useState([]);
+
    const handleTokenClick = (selectedToken) => {
       onTokenSelect(selectedToken);
       isClose();
-      console.log(selectedToken);
+      // console.log(selectedToken);
    };
+
+   useEffect(() => {
+      async function fetchOnChainTradeData() {
+         try {
+            const response = await fetch('/api/onChainTradeData');
+            if (response.ok) {
+               const data = await response.json();
+
+               // console.log(data);
+               setOnChainTradeData(data);
+            } else {
+               throw new Error('Failed to fetch onChainTradeData');
+            }
+         } catch (error) {
+            console.error('Error fetching onChainTradeData:', error);
+         }
+      }
+
+      fetchOnChainTradeData();
+   }, []);
 
    // useEffect(() => {
    //    async function fetchExchangeRates() {
@@ -67,7 +89,7 @@ const Modal = ({ isClose, isOpen, onTokenSelect }) => {
                </div>
 
                <div className="grid grid-cols-3  space-x-3 m-1">
-                  {OnChainTrade.map((trade) => (
+                  {onChainTradeData.map((trade) => (
                      <button
                         key={trade.id}
                         onClick={() => handleTokenClick(trade)}

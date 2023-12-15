@@ -1,4 +1,6 @@
-export const OnChainTrade = [
+// api/onChainTradeData.js
+
+const onChainTradeData = [
    {
       id: 1,
       token: '0x0000000000000000000000000000000000000000',
@@ -25,3 +27,7 @@ export const OnChainTrade = [
       symbol: 'AAVA',
    },
 ];
+
+export default function handler(req, res) {
+   res.status(200).json(onChainTradeData);
+}

@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { OnChainTrade } from '@/pages/data/onChainTradeData';
 import Modal from '@/components/Modal';
 
 import {
@@ -28,6 +27,7 @@ const RubicIntJs = () => {
    // const [tradeTypePrices, setTradeTypePrices] = useState(null);
    // const [tradeAmounts, setTradeAmounts] = useState(null);
    const [tradesData, setTradesData] = useState(null);
+   const [onChainTradeData, setOnChainTradeData] = useState([]);
 
    const openModal = (tokenType) => {
       setSelectedTokenType(tokenType);
@@ -38,6 +38,26 @@ const RubicIntJs = () => {
    const closeModal = () => {
       setIsModalOpen(false);
    };
+
+   useEffect(() => {
+      async function fetchOnChainTradeData() {
+         try {
+            const response = await fetch('/api/onChainTradeData');
+            if (response.ok) {
+               const data = await response.json();
+
+               // console.log(data);
+               setOnChainTradeData(data);
+            } else {
+               throw new Error('Failed to fetch onChainTradeData');
+            }
+         } catch (error) {
+            console.error('Error fetching onChainTradeData:', error);
+         }
+      }
+
+      fetchOnChainTradeData();
+   }, []);
 
    const initializeRubicSDK = useCallback(async () => {
       const config = {
@@ -459,7 +479,7 @@ const RubicIntJs = () => {
             isOpen={isModalOpen}
             isClose={closeModal}
             onTokenSelect={(selectedToken) => handleTokenSelect(selectedToken)}
-            tokens={OnChainTrade}
+            tokens={onChainTradeData}
          />
       </>
    );
