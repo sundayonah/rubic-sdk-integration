@@ -2,26 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-}
-
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+   background: #282936;
+}
+
+.quantity::-webkit-inner-spin-button,
+.quantity::-webkit-outer-spin-button {
+   -webkit-appearance: none;
+   margin: 0;
+}
+
+.black {
+   background: red;
+}
+
+/* Customize the scrollbar thumb (the draggable part) */
+.customScrollbar::-webkit-scrollbar-thumb {
+   background-color: #222331; /* Change the color of the thumb */
+   border-radius: 6px; /* Add rounded corners to the thumb */
+}
+
+/* Customize the scrollbar track (the background) */
+.customScrollbar::-webkit-scrollbar-track {
+   background-color: #3b3d4f;
+}
+
+/* Customize the scrollbar's width and height */
+.customScrollbar::-webkit-scrollbar {
+   width: 5px; /* Set the width of the scrollbar */
+   height: 10px; /* Set the height of the scrollbar */
 }
