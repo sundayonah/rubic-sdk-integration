@@ -168,7 +168,7 @@ const RubicIntJs = () => {
                   fromAmount,
                   toTokenAddress
                );
-               // console.log(trades, 'trades');
+               console.log(trades, 'trades');
                // const bestTrade = trades[0];
                // console.log(bestTrade.type, 'best trade');
                const tradesData = trades.map((trade) => ({
@@ -433,13 +433,14 @@ const RubicIntJs = () => {
                               )}
                         </div>
                      </div>
-
-                     <button
-                        className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
-                        onClick={handleSwapButtonClick}
-                     >
-                        Swap
-                     </button>
+                     <div className="flex justify-center items-center my-2 rounded-md bg-blue-500 hover:bg-blue-700">
+                        <button
+                           className=" text-white py-2 px-4 rounded "
+                           onClick={handleSwapButtonClick}
+                        >
+                           Swap
+                        </button>
+                     </div>
                   </div>
                </div>
                {/* LEFT SIDE */}
