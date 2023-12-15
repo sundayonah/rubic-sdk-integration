@@ -54,9 +54,9 @@ const Modal = ({ isClose, isOpen, onTokenSelect }) => {
 
    return (
       <div className="  ">
-         <div className="fixed  bottom-56 z-50 w-full h-full bg-opacity-70 flex justify-center items-center  ">
+         <div className="fixed  bottom-52 z-50 w-full h-full bg-opacity-70 flex justify-center items-center  ">
             {/* left */}
-            <div className="bg-[#3b3d4f] p-2 rounded-2xl max-w-lg mx-auto w-[80%] border border-slate-500">
+            <div className="bg-[#3b3d4f] p-2 rounded-2xl max-w-lg mx-auto w-[80%] border border-slate-600">
                <div className="flex justify-between items-center py-2 px-4">
                   <span className="text-gray-300">Swap Form</span>
                   <button className="text-gray-300" onClick={isClose}>

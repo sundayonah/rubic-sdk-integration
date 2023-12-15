@@ -344,7 +344,7 @@ const RubicIntJs = () => {
 
    return (
       <>
-         <div className="mt-12">
+         <div className="mx-auto mt-12">
             <div className=" m-auto grid max-w-md grid-cols-1 gap-8 lg:max-w-4xl lg:grid-cols-2 ">
                {/* RIGHT SIDE */}
                <div>
@@ -443,11 +443,11 @@ const RubicIntJs = () => {
                   </div>
                </div>
                {/* LEFT SIDE */}
-               <div className="">
-                  <div className=" p-4  rounded-2xl shadow-2xl bg-[#3b3d4f]">
-                     <span className="text-white pl-3">Providers List</span>
-                     <div className=" overflow-y-scroll h-96 scroll-smooth customScrollbar">
-                        {tradesData ? (
+               {tradesData && (
+                  <div className="">
+                     <div className=" p-4  rounded-2xl shadow-2xl bg-[#3b3d4f]">
+                        <span className="text-white pl-3">Providers List</span>
+                        <div className=" overflow-y-scroll h-96 scroll-smooth customScrollbar">
                            <div className="text-gray-300 p-3  bg-[#3b3d4f]">
                               {tradesData.map((data) => (
                                  <div
@@ -467,12 +467,10 @@ const RubicIntJs = () => {
                                  </div>
                               ))}
                            </div>
-                        ) : (
-                           <span>No trade types available</span>
-                        )}
+                        </div>
                      </div>
                   </div>
-               </div>
+               )}
             </div>
          </div>
          <Modal
