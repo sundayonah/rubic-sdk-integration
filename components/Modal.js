@@ -30,24 +30,6 @@ const Modal = ({ isClose, isOpen, onTokenSelect }) => {
       fetchOnChainTradeData();
    }, []);
 
-   // useEffect(() => {
-   //    async function fetchExchangeRates() {
-   //       try {
-   //          const response = await fetch('/api/CurrencyRate');
-   //          console.log(response);
-   //          if (response.ok) {
-   //             const data = await response.json();
-   //             console.log(data.rates.NGN);
-   //          } else {
-   //             throw new Error('Failed to fetch exchange rates');
-   //          }
-   //       } catch (error) {
-   //          console.error('Error fetching exchange rates:', error);
-   //       }
-   //    }
-   //    fetchExchangeRates();
-   // }, []);
-
    if (!isOpen) {
       return null;
    }

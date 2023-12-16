@@ -114,138 +114,138 @@ const RubicIntJs = () => {
       fetchData();
    }, [initializeRubicSDK]);
 
-   const handleTokenSelect = useCallback(
-      async (selectedToken) => {
-         // Check if the required data is available
-         // if (!selectedInputToken || !selectedOutputToken || !userInput) {
-         //    setIsLoading(false); // Set loading to false if we return early
-         //    return;
-         // }
+   // const handleTokenSelect = useCallback(
+   //    async (selectedToken) => {
+   //       // Check if the required data is available
+   //       // if (!selectedInputToken || !selectedOutputToken || !userInput) {
+   //       //    setIsLoading(false); // Set loading to false if we return early
+   //       //    return;
+   //       // }
 
-         // if (!userInput) {
-         //    setIsLoading(false); // Set loading to false if we return early
-         //    return;
-         // }
-         setIsLoading(true);
+   //       // if (!userInput) {
+   //       //    setIsLoading(false); // Set loading to false if we return early
+   //       //    return;
+   //       // }
+   //       setIsLoading(true);
 
-         try {
-            const sdk = await initializeRubicSDK();
+   //       try {
+   //          const sdk = await initializeRubicSDK();
 
-            const blockchain = BLOCKCHAIN_NAME.ETHEREUM;
+   //          const blockchain = BLOCKCHAIN_NAME.ETHEREUM;
 
-            let fromTokenAddress = '';
-            let toTokenAddress = '';
-            const fromAmount = parseFloat(userInput);
+   //          let fromTokenAddress = '';
+   //          let toTokenAddress = '';
+   //          const fromAmount = parseFloat(userInput);
 
-            if (selectedTokenType === 'input') {
-               fromTokenAddress =
-                  selectedToken.token || selectedInputToken?.token;
-               toTokenAddress = selectedOutputToken?.token;
+   //          if (selectedTokenType === 'input') {
+   //             fromTokenAddress =
+   //                selectedToken.token || selectedInputToken?.token;
+   //             toTokenAddress = selectedOutputToken?.token;
 
-               console.log(fromTokenAddress, toTokenAddress);
+   //             console.log(fromTokenAddress, toTokenAddress);
 
-               // Update the selected input token state
-               setSelectedInputToken(selectedToken);
-            } else if (selectedTokenType === 'output') {
-               fromTokenAddress = selectedInputToken?.token;
-               toTokenAddress =
-                  selectedToken.token || selectedOutputToken?.token;
+   //             // Update the selected input token state
+   //             setSelectedInputToken(selectedToken);
+   //          } else if (selectedTokenType === 'output') {
+   //             fromTokenAddress = selectedInputToken?.token;
+   //             toTokenAddress =
+   //                selectedToken.token || selectedOutputToken?.token;
 
-               // Update the selected output token state
-               setSelectedOutputToken(selectedToken);
-            }
+   //             // Update the selected output token state
+   //             setSelectedOutputToken(selectedToken);
+   //          }
 
-            if (!fromTokenAddress || !toTokenAddress || !fromAmount) {
-               throw new Error('Make sure all the conditions are meet');
-            }
+   //          if (!fromTokenAddress || !toTokenAddress || !fromAmount) {
+   //             throw new Error('Make sure all the conditions are meet');
+   //          }
 
-            console.log(fromAmount, userInput);
-            // Calculate trades only if conditions are met
-            if (selectedInputToken && selectedOutputToken && userInput) {
-               console.log('execute trades');
-               const trades = await sdk.onChainManager.calculateTrade(
-                  { blockchain, address: fromTokenAddress },
-                  fromAmount,
-                  toTokenAddress
-               );
-               console.log(trades, 'trades');
-               // const bestTrade = trades[0];
-               // console.log(bestTrade.type, 'best trade');
-               const tradesData = trades.map((trade) => ({
-                  type: trade.type,
-                  amount:
-                     trade.to && trade.to.tokenAmount
-                        ? trade.to.tokenAmount.toFormat(7)
-                        : 'N/A',
-               }));
+   //          console.log(fromAmount, userInput);
+   //          // Calculate trades only if conditions are met
+   //          if (selectedInputToken && selectedOutputToken && userInput) {
+   //             console.log('execute trades');
+   //             const trades = await sdk.onChainManager.calculateTrade(
+   //                { blockchain, address: fromTokenAddress },
+   //                fromAmount,
+   //                toTokenAddress
+   //             );
+   //             console.log(trades, 'trades');
+   //             // const bestTrade = trades[0];
+   //             // console.log(bestTrade.type, 'best trade');
+   //             const tradesData = trades.map((trade) => ({
+   //                type: trade.type,
+   //                amount:
+   //                   trade.to && trade.to.tokenAmount
+   //                      ? trade.to.tokenAmount.toFormat(7)
+   //                      : 'N/A',
+   //             }));
 
-               setTradesData(tradesData);
+   //             setTradesData(tradesData);
 
-               console.log(tradesData);
+   //             console.log(tradesData);
 
-               // const tradeTypesArray = trades.map((trade) => trade.type);
-               // console.log(tradeTypesArray);
-               // setTradeTypes(tradeTypesArray.join(', '));
+   //             // const tradeTypesArray = trades.map((trade) => trade.type);
+   //             // console.log(tradeTypesArray);
+   //             // setTradeTypes(tradeTypesArray.join(', '));
 
-               // const amountsArray = trades.map((trade) =>
-               //    trade.to && trade.to.tokenAmount
-               //       ? trade.to.tokenAmount.toFormat(3)
-               //       : 'N/A'
-               // );
-               // console.log(amountsArray);
-               // setTradeAmounts(amountsArray.join(', '));
+   //             // const amountsArray = trades.map((trade) =>
+   //             //    trade.to && trade.to.tokenAmount
+   //             //       ? trade.to.tokenAmount.toFormat(3)
+   //             //       : 'N/A'
+   //             // );
+   //             // console.log(amountsArray);
+   //             // setTradeAmounts(amountsArray.join(', '));
 
-               trades.forEach((trade) => {
-                  // const tradeType = trade.type;
-                  // setTradeTypes(tradeType);
-                  // console.log(`trade type: ${tradeType}`);
-                  console.log(trade.to);
-                  if (trade && trade.to && trade.to.tokenAmount) {
-                     console.log(
-                        `to amount: ${trade.to.tokenAmount.toFormat(3)}`
-                     );
-                     setResult(`${trade.to.tokenAmount.toFormat(7)}`);
-                     setIsLoading(false);
-                  } else if (trade) {
-                     console.log(`error: ${trade.error}`);
-                  }
-               });
-            }
+   //             trades.forEach((trade) => {
+   //                // const tradeType = trade.type;
+   //                // setTradeTypes(tradeType);
+   //                // console.log(`trade type: ${tradeType}`);
+   //                console.log(trade.to);
+   //                if (trade && trade.to && trade.to.tokenAmount) {
+   //                   console.log(
+   //                      `to amount: ${trade.to.tokenAmount.toFormat(3)}`
+   //                   );
+   //                   setResult(`${trade.to.tokenAmount.toFormat(7)}`);
+   //                   setIsLoading(false);
+   //                } else if (trade) {
+   //                   console.log(`error: ${trade.error}`);
+   //                }
+   //             });
+   //          }
 
-            // const trades = await sdk.onChainManager.calculateTrade(
-            //    { blockchain, address: fromTokenAddress },
-            //    fromAmount,
-            //    toTokenAddress
-            // );
-            // console.log(trades, 'trades');
-            // const bestTrade = trades[0];
-            // console.log(bestTrade.type, 'best trade');
+   //          // const trades = await sdk.onChainManager.calculateTrade(
+   //          //    { blockchain, address: fromTokenAddress },
+   //          //    fromAmount,
+   //          //    toTokenAddress
+   //          // );
+   //          // console.log(trades, 'trades');
+   //          // const bestTrade = trades[0];
+   //          // console.log(bestTrade.type, 'best trade');
 
-            // trades.forEach((trade) => {
-            //    const tradeType = trade.type;
-            //    setTradeTypes(tradeType);
-            //    console.log(`trade type: ${tradeType}`);
+   //          // trades.forEach((trade) => {
+   //          //    const tradeType = trade.type;
+   //          //    setTradeTypes(tradeType);
+   //          //    console.log(`trade type: ${tradeType}`);
 
-            //    if (trade && trade.to && trade.to.tokenAmount) {
-            //       console.log(`to amount: ${trade.to.tokenAmount.toFormat(3)}`);
-            //       setResult(`${trade.to.tokenAmount.toFormat(4)}`);
-            //       setIsLoading(false);
-            //    } else if (trade) {
-            //       console.log(`error: ${trade.error}`);
-            //    }
-            // });
-         } catch (error) {
-            console.error('Error handling user input:', error);
-         }
-      },
-      [
-         userInput,
-         selectedTokenType,
-         selectedInputToken,
-         selectedOutputToken,
-         initializeRubicSDK,
-      ]
-   );
+   //          //    if (trade && trade.to && trade.to.tokenAmount) {
+   //          //       console.log(`to amount: ${trade.to.tokenAmount.toFormat(3)}`);
+   //          //       setResult(`${trade.to.tokenAmount.toFormat(4)}`);
+   //          //       setIsLoading(false);
+   //          //    } else if (trade) {
+   //          //       console.log(`error: ${trade.error}`);
+   //          //    }
+   //          // });
+   //       } catch (error) {
+   //          console.error('Error handling user input:', error);
+   //       }
+   //    },
+   //    [
+   //       userInput,
+   //       selectedTokenType,
+   //       selectedInputToken,
+   //       selectedOutputToken,
+   //       initializeRubicSDK,
+   //    ]
+   // );
 
    // // Effect to handle token selection
    // useEffect(() => {
@@ -275,13 +275,85 @@ const RubicIntJs = () => {
    //    }
    // }, [selectedInputToken, selectedOutputToken, userInput, handleTokenSelect]);
 
+   const handleTokenSelect = useCallback(
+      async (selectedToken) => {
+         setIsLoading(true);
+
+         try {
+            const sdk = await initializeRubicSDK();
+            const blockchain = BLOCKCHAIN_NAME.ETHEREUM;
+
+            let fromTokenAddress = '';
+            let toTokenAddress = '';
+            const fromAmount = parseFloat(userInput);
+
+            if (selectedTokenType === 'input') {
+               fromTokenAddress = selectedToken.token;
+               toTokenAddress = selectedOutputToken?.token;
+
+               // Update the selected input token state
+               setSelectedInputToken(selectedToken);
+            } else if (selectedTokenType === 'output') {
+               fromTokenAddress = selectedInputToken?.token;
+               toTokenAddress = selectedToken.token;
+
+               // Update the selected output token state
+               setSelectedOutputToken(selectedToken);
+            }
+
+            if (!fromTokenAddress || !toTokenAddress || !fromAmount) {
+               throw new Error('Make sure all the conditions are met');
+            }
+
+            // Calculate trades only if conditions are met
+            if (selectedInputToken && selectedOutputToken && userInput) {
+               const trades = await sdk.onChainManager.calculateTrade(
+                  { blockchain, address: fromTokenAddress },
+                  fromAmount,
+                  toTokenAddress
+               );
+
+               const tradesData = trades.map((trade) => ({
+                  type: trade.type,
+                  amount:
+                     trade.to && trade.to.tokenAmount
+                        ? trade.to.tokenAmount.toFormat(7)
+                        : 'N/A',
+               }));
+
+               setTradesData(tradesData);
+
+               trades.forEach((trade) => {
+                  if (trade && trade.to && trade.to.tokenAmount) {
+                     setResult(`${trade.to.tokenAmount.toFormat(7)}`);
+                     setIsLoading(false);
+                  } else if (trade) {
+                     console.log(`error: ${trade.error}`);
+                  }
+               });
+            }
+         } catch (error) {
+            console.error('Error handling user input:', error);
+         }
+      },
+      [
+         userInput,
+         selectedTokenType,
+         selectedInputToken,
+         selectedOutputToken,
+         initializeRubicSDK,
+      ]
+   );
+
    useEffect(() => {
       // Check if both input and output tokens are selected and user input is provided
       if (selectedInputToken && selectedOutputToken && userInput !== '') {
          console.log('run');
-         handleTokenSelect(selectedInputToken, selectedOutputToken, userInput);
+
+         console.log({ selectedInputToken, selectedOutputToken, userInput });
+         handleTokenSelect(selectedOutputToken);
       }
-   }, [selectedInputToken, selectedOutputToken, userInput, handleTokenSelect]);
+   }, [selectedOutputToken, selectedInputToken, userInput, handleTokenSelect]);
 
    // console.log(tradeTypes);
 
@@ -301,10 +373,10 @@ const RubicIntJs = () => {
          setUserInput(result);
          setResult(tempInput);
 
-         // Toggle selected token type
-         setSelectedTokenType(
-            selectedTokenType === 'input' ? 'output' : 'input'
-         );
+         // // Toggle selected token type
+         // setSelectedTokenType(
+         //    selectedTokenType === 'input' ? 'output' : 'input'
+         // );
       } else {
          // Handle the case where one of the tokens is not selected
          console.error('Please select both input and output tokens.');
@@ -348,7 +420,7 @@ const RubicIntJs = () => {
             <div className=" m-auto grid max-w-md grid-cols-1 gap-8 lg:max-w-4xl lg:grid-cols-2 ">
                {/* RIGHT SIDE */}
                <div>
-                  <div className=" p-6 rounded-2xl shadow-2xl bg-[#3b3d4f]">
+                  <div className=" p-4 rounded-2xl shadow-2xl bg-[#3b3d4f]">
                      <div className="flex py-3">
                         <p className="text-gray-300 pr-2">Swap</p>
                         <span className="text-gray-500">Gas</span>
@@ -438,7 +510,7 @@ const RubicIntJs = () => {
                            className=" text-white py-2 px-4 rounded "
                            onClick={handleSwapButtonClick}
                         >
-                           Swap
+                           Preview Swap
                         </button>
                      </div>
                   </div>
@@ -449,22 +521,31 @@ const RubicIntJs = () => {
                      <div className=" p-4  rounded-2xl shadow-2xl bg-[#3b3d4f]">
                         <span className="text-white pl-3">Providers List</span>
                         <div className=" overflow-y-scroll h-96 scroll-smooth customScrollbar">
-                           <div className="text-gray-300 p-3  bg-[#3b3d4f]">
+                           <div className="text-gray-300 -mt-3 p-1  bg-[#3b3d4f]">
                               {tradesData.map((data) => (
                                  <div
                                     key={data.type}
-                                    className="space-y-0.5 py-1 px-2"
+                                    className="space-y-0.5 py-1 px-1"
                                  >
-                                    <div className=" flex-col flex justify-between  py-1 px-3 rounded-t-2xl bg-[#222331]">
-                                       <span>{data.amount}... ...</span>
-                                       <span className="text-xs">
-                                          {data.type}
-                                       </span>
-                                    </div>
-                                    <div className="flex justify-between  items-center py-2 px-3 rounded-b-2xl bg-[#2c2d3e]">
-                                       <span className="text-xs">115.88</span>
-                                       <span className="text-xs">1m</span>
-                                    </div>
+                                    {data.amount !== 'N/A' && (
+                                       <>
+                                          <div className=" flex-col flex justify-between  py-1 px-2 rounded-t-2xl bg-[#222331]">
+                                             <span className="text-sm">
+                                                {data.amount}...{' '}
+                                                {selectedOutputToken.symbol}
+                                             </span>
+                                             <span className="text-xs">
+                                                {data.type}
+                                             </span>
+                                          </div>
+                                          <div className="flex justify-between  items-center py-2 px-2 rounded-b-2xl bg-[#2c2d3e]">
+                                             <span className="text-xs">
+                                                115.88
+                                             </span>
+                                             <span className="text-xs">1m</span>
+                                          </div>
+                                       </>
+                                    )}
                                  </div>
                               ))}
                            </div>
