@@ -45,7 +45,7 @@ export default function Home() {
             <img
                src="https://onahsunday.vercel.app/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fmy-avatar.be8f261b.png&w=96&q=75"
                alt="Logo"
-               width={50}
+               width={30}
                height={50}
             />
             <div className="">

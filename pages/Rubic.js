@@ -14,6 +14,7 @@ import { ethers } from 'ethers';
 import { formatEther } from 'ethers';
 import { parseUnits } from 'ethers';
 import swapAbi from '@/Contract/swapAbi.json';
+import Exploring from '@/components/Exploring';
 
 const RubicIntJs = () => {
    const { address } = useAccount();
@@ -203,7 +204,9 @@ const RubicIntJs = () => {
    // Fetch the balance of a token for the connected account
    async function GetTokenBalance(tokenAddress) {
       try {
-         const provider = new ethers.BrowserProvider(window.ethereum);
+         // const provider = new ethers.BrowserProvider(window.ethereum);
+         const provider = new ethers.providers.Web3Provider(window.ethereum);
+
          const contract = new ethers.Contract(
             tokenAddress,
             ['function balanceOf(address) view returns (uint256)'],
@@ -212,7 +215,7 @@ const RubicIntJs = () => {
 
          // Call balanceOf function to get the balance
          const balance = await contract.balanceOf(address);
-         const formatBalance = ethers.formatEther(balance);
+         const formatBalance = ethers.utils.formatEther(balance);
          return balance.toString();
       } catch (error) {
          console.error(
@@ -588,47 +591,132 @@ const RubicIntJs = () => {
       }
    }, [selectedOutputToken, selectedInputToken, userInput, handleTokenSelect]);
 
-   // This function is triggered when the "Swap" button is clicked
+   // // This function is triggered when the "Swap" button is clicked
+   // const handleSwapButtonClick = async () => {
+   //    // setInitialized(true);
+   //    try {
+   //       // const fromAmount1 = ethers.parseUnits(userInput, 'ether'); // Convert user input to Wei
+   //       if (window.ethereum) {
+   //          const fromAmount = parseFloat(userInput);
+
+   //          console.log(fromAmount);
+   //          // console.log(fromAmount1);
+   //          const amountOutMin = 0; // Set the minimum acceptable amount of the output token
+   //          const path = [selectedInputToken.token, selectedOutputToken.token]; // An array of token addresses representing the swap path
+   //          const to = address; // The address that will receive the output tokens
+   //          const deadline = Math.floor(Date.now() / 1000) + 60 * 10; // Deadline for the transaction (10 minutes from now)
+
+   //          // const provider = new ethers.BrowserProvider(window.ethereum);
+   //          const provider = new ethers.AlchemyProvider(
+   //             'https://eth-goerli.g.alchemy.com/v2/yl554fd8p2xFr3naNTl0LfsyoxA-lidx'
+   //          );
+
+   //          const signer = provider.getSigner();
+
+   //          const contractInstance = new ethers.Contract(
+   //             '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
+   //             swapAbi,
+   //             signer
+   //          );
+   //          const tx = await contractInstance.swapExactTokensForTokens(
+   //             fromAmount,
+   //             amountOutMin,
+   //             path,
+   //             to,
+   //             deadline
+   //          );
+   //          const receipt = await tx.wait();
+   //          console.log(receipt);
+   //       } else {
+   //          console.error('MetaMask or Ethereum provider not detected');
+   //       }
+   //    } catch (err) {
+   //       console.error(err);
+   //    }
+   // };
+
+   const handleApprove = async () => {
+      try {
+         const amountToApprove = ethers.utils.parseUnits(userInput, 'ether'); // Convert to the token's decimals
+
+         // const provider = new ethers.BrowserProvider(window.ethereum);
+         const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+         const signer = provider.getSigner();
+
+         // Assuming you have the ERC-20 token contract instance
+         const tokenContract = new ethers.Contract(
+            selectedInputToken.token,
+            [
+               'function approve(address spender, uint256 amount) returns (bool)',
+            ],
+            signer // Assuming you have the signer object
+         );
+
+         // console.log(tokenContract);
+
+         const approvalTx = await tokenContract.approve(
+            '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D', // Uniswap contract address
+
+            amountToApprove,
+            {
+               gasLimit: 600000,
+               gasPrice: ethers.utils.parseUnits('10.0', 'gwei'),
+            }
+         );
+
+         console.log(approvalTx);
+
+         await approvalTx.wait();
+         console.log('Approval successful');
+      } catch (err) {
+         console.error('Error approving tokens:', err);
+      }
+   };
+
    const handleSwapButtonClick = async () => {
       // setInitialized(true);
+
       try {
-         // const fromAmount1 = ethers.parseUnits(userInput, 'ether'); // Convert user input to Wei
-         if (window.ethereum) {
-            const fromAmount = parseFloat(userInput);
+         // if (!window.ethereum || !window.ethereum.isConnected()) {
+         //    console.error(
+         //       'Please connect to MetaMask or another Ethereum wallet.'
+         //    );
+         //    return;
+         // }
 
-            console.log(fromAmount);
-            // console.log(fromAmount1);
-            const amountOutMin = 0; // Set the minimum acceptable amount of the output token
-            const path = [selectedInputToken.token, selectedOutputToken.token]; // An array of token addresses representing the swap path
-            const to = address; // The address that will receive the output tokens
-            const deadline = Math.floor(Date.now() / 1000) + 60 * 10; // Deadline for the transaction (10 minutes from now)
+         const fromAmount = ethers.utils.parseUnits(userInput, 'ether');
+         const provider = new ethers.providers.Web3Provider(window.ethereum);
+         const signer = provider.getSigner();
 
-            // const provider = new ethers.BrowserProvider(window.ethereum);
-            const provider = new ethers.AlchemyProvider(
-               'https://eth-goerli.g.alchemy.com/v2/yl554fd8p2xFr3naNTl0LfsyoxA-lidx'
-            );
+         const contractInstance = new ethers.Contract(
+            '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
+            swapAbi,
+            signer
+         );
 
-            const signer = provider.getSigner();
+         const amountOutMin = 0;
+         const path = [selectedInputToken.token, selectedOutputToken.token];
+         const to = address; // Assuming 'address' is the user's wallet address
+         const deadline = Math.floor(Date.now() / 1000) + 60 * 10;
 
-            const contractInstance = new ethers.Contract(
-               '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
-               swapAbi,
-               signer
-            );
-            const tx = await contractInstance.swapExactTokensForTokens(
-               fromAmount,
-               amountOutMin,
-               path,
-               to,
-               deadline
-            );
-            const receipt = await tx.wait();
-            console.log(receipt);
-         } else {
-            console.error('MetaMask or Ethereum provider not detected');
-         }
+         const tx = await contractInstance.swapExactTokensForTokens(
+            fromAmount,
+            amountOutMin,
+            path,
+            to,
+            deadline,
+            {
+               gasLimit: 600000,
+               gasPrice: ethers.utils.parseUnits('10.0', 'gwei'),
+            }
+         );
+
+         const receipt = await tx.wait();
+
+         console.log(receipt);
       } catch (err) {
-         console.error(err);
+         console.error('Error executing swap:', err);
       }
    };
 
@@ -803,12 +891,21 @@ const RubicIntJs = () => {
                               )}
                         </div>
                      </div>
-                     <div className="flex justify-center items-center my-2 rounded-md bg-blue-500 hover:bg-blue-700 cursor-pointer">
+                     <div
+                        // className="flex justify-center items-center my-2 rounded-md bg-blue-500 hover:bg-blue-700 cursor-pointer">
+                        className="flex justify-between items-center my-1 space-x-3"
+                     >
                         <button
-                           className=" text-white py-2 px-4 rounded "
+                           className="w-full text-white py-2 px-4 rounded-md bg-blue-500 hover:bg-blue-700 "
                            onClick={handleSwapButtonClick}
                         >
                            Swap
+                        </button>
+                        <button
+                           className="w-full text-white py-2 px-8  rounded-md bg-blue-500 hover:bg-blue-700"
+                           onClick={handleApprove}
+                        >
+                           Approve
                         </button>
                      </div>
                   </div>
@@ -852,6 +949,7 @@ const RubicIntJs = () => {
                   </div>
                )}
             </div>
+            {/* <Exploring /> */}
          </div>
          <Modal
             isOpen={isModalOpen}
