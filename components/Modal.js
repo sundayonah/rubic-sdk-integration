@@ -1,8 +1,15 @@
+import { ethers } from 'ethers';
 import React, { useEffect, useState } from 'react';
+import { useAccount } from 'wagmi';
 // import { OnChainTrade } from '@/pages/data/onChainTradeData';
 
-const Modal = ({ isClose, isOpen, onTokenSelect }) => {
+const Modal = ({ isClose, isOpen, onTokenSelect, tokens }) => {
+   const { address } = useAccount();
+
    const [onChainTradeData, setOnChainTradeData] = useState([]);
+   // const [onChainTradeDataAndBalance, setOnChainTradeDataAndBalance] = useState(
+   //    []
+   // );
 
    const handleTokenClick = (selectedToken) => {
       onTokenSelect(selectedToken);
@@ -10,25 +17,74 @@ const Modal = ({ isClose, isOpen, onTokenSelect }) => {
       // console.log(selectedToken);
    };
 
-   useEffect(() => {
-      async function fetchOnChainTradeData() {
-         try {
-            const response = await fetch('/api/onChainTradeData');
-            if (response.ok) {
-               const data = await response.json();
+   // console.log(tokens);
 
-               // console.log(data);
-               setOnChainTradeData(data);
-            } else {
-               throw new Error('Failed to fetch onChainTradeData');
-            }
-         } catch (error) {
-            console.error('Error fetching onChainTradeData:', error);
-         }
-      }
+   // useEffect(() => {
+   //    async function fetchOnChainTradeData() {
+   //       try {
+   //          const response = await fetch('/api/onChainTradeData');
+   //          if (response.ok) {
+   //             const data = await response.json();
 
-      fetchOnChainTradeData();
-   }, []);
+   //             // console.log(data);
+   //             setOnChainTradeData(data);
+   //          } else {
+   //             throw new Error('Failed to fetch onChainTradeData');
+   //          }
+   //       } catch (error) {
+   //          console.error('Error fetching onChainTradeData:', error);
+   //       }
+   //    }
+
+   //    fetchOnChainTradeData();
+   // }, []);
+
+   // // Fetch the balance of a token for the connected account
+   // async function GetTokenBalance(tokenAddress) {
+   //    try {
+   //       const provider = new ethers.BrowserProvider(window.ethereum);
+   //       const contract = new ethers.Contract(
+   //          tokenAddress,
+   //          ['function balanceOf(address) view returns (uint256)'],
+   //          provider
+   //       );
+
+   //       // Call balanceOf function to get the balance
+   //       const balance = await contract.balanceOf(address);
+   //       return balance.toString();
+   //    } catch (error) {
+   //       console.error(
+   //          `Error fetching balance for token ${tokenAddress}:`,
+   //          error
+   //       );
+   //       throw error;
+   //    }
+   // }
+
+   // // Display balances
+   // async function DisplayBalances() {
+   //    try {
+   //       // console.log(onChainTradeData);
+
+   //       // Fetch balances for each token in onChainTradeData
+   //       const balances = await Promise.all(
+   //          onChainTradeData.map(async (token) => {
+   //             const tokenBalance = await GetTokenBalance(token.token);
+   //             // console.log(tokenBalance);
+   //             return { ...token, balance: tokenBalance };
+   //          })
+   //       );
+   //       setOnChainTradeDataAndBalance(balances);
+
+   //       // console.log('Balances:', balances);
+
+   //    } catch (error) {
+   //       console.error('Error displaying balances:', error);
+   //    }
+   // }
+
+   // // Execute the function to display balances
+   // DisplayBalances();
 
    if (!isOpen) {
       return null;
@@ -71,15 +127,18 @@ const Modal = ({ isClose, isOpen, onTokenSelect }) => {
                </div>
 
                <div className="grid grid-cols-3  space-x-3 m-1">
-                  {onChainTradeData.map((trade) => (
-                     <button
-                        key={trade.id}
-                        onClick={() => handleTokenClick(trade)}
-                        // onClick={() => onTokenSelect(trade)}
-                        className=" text-gray-300 bg-[#282936] rounded-2xl p-2 mt-2"
-                     >
-                        {trade.symbol}
-                     </button>
+                  {tokens.map((trade) => (
+                     <>
+                        <button
+                           key={trade.id}
+                           onClick={() => handleTokenClick(trade)}
+                           // onClick={() => onTokenSelect(trade)}
+                           className=" text-gray-300 bg-[#282936] rounded-2xl p-2 mt-2"
+                        >
+                           {trade.symbol}
+                        </button>
+                        {/* <span>{trade.balance}</span> */}
+                     </>
                   ))}
                </div>
             </div>

@@ -9,8 +9,141 @@ import {
    CHAIN_TYPE,
 } from 'rubic-sdk';
 import axios from 'axios';
+import { useAccount, useBalance, useToken } from 'wagmi';
+import { ethers } from 'ethers';
+import { formatEther } from 'ethers';
+import { parseUnits } from 'ethers';
+import swapAbi from '@/Contract/swapAbi.json';
 
 const RubicIntJs = () => {
+   const { address } = useAccount();
+
+   // console.log(address);
+
+   // const tokenAddress = '0x07865c6E87B9F70255377e024ace6630C1Eaa37F';
+   // // const walletAddress = '0x9756B7048Be34e704C27DeEb7dB34BE1A910aB92';
+
+   // const { data, isError } = useToken({
+   //    address: '0x07865c6E87B9F70255377e024ace6630C1Eaa37F',
+   // });
+   // console.log(data);
+
+   // const balance = useBalance({
+   //    address: '0x07865c6E87B9F70255377e024ace6630C1Eaa37F',
+   // });
+
+   // console.log(balance);
+
+   // const token = useToken({
+   //    address: '0x9756B7048Be34e704C27DeEb7dB34BE1A910aB92',
+   //    chainId: 1,
+   // });
+
+   // console.log(token);
+
+   //   useEffect(() => {
+   //      const busdBalance = async () => {
+   //         try {
+   //            // const provider = new ethers.providers.Web3Provider(window.ethereum);
+   //            const provider = new ethers.getDefaultProvider(
+   //               'https://bsc-dataseed1.binance.org/'
+   //            );
+   //            // const signer = provider.getSigner();
+   //            const contractInstance = new ethers.Contract(
+   //               bscAddress,
+   //               bscAbi,
+   //               provider
+   //            );
+   //            const bal = await contractInstance.balanceOf(address);
+   //            const balance = ethers.utils.formatEther(bal, 'ether');
+   //            const etherAmountAsNumber = parseFloat(balance.toString());
+   //            const roundedEtherAmount = etherAmountAsNumber.toFixed(3);
+   //            setBusdBalance(roundedEtherAmount);
+   //         } catch (error) {
+   //            console.error(error);
+   //         }
+   //      };
+   //      busdBalance();
+   //   }, [address]);
+
+   //GET BALANCE IN BNB
+
+   // useEffect(() => {
+   //    const fetchBalance = async () => {
+   //       try {
+   //          const provider = new ethers.BrowserProvider(window.ethereum);
+
+   //          const contract = new ethers.Contract(
+   //             '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6',
+   //             ['function balanceOf(address) view returns (uint256)'],
+   //             provider
+   //          );
+
+   //          const balance = await contract.balanceOf(address);
+
+   //          console.log(balance.toString());
+   //          // return balance.toString();
+
+   //          // setBnbBalance(balanceInEther);
+   //       } catch (error) {
+   //          console.error(error);
+   //       }
+   //    };
+
+   //    if (address) {
+   //       fetchBalance();
+   //    }
+   // }, [address]);
+
+   // Define the contract addresses for USDC and WETH on Goerli
+   const usdcAddress = '0x07865c6E87B9F70255377e024ace6630C1Eaa37F';
+   const wethAddress = '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6';
+
+   // Fetch the balance of a token for the connected account
+   // async function GetTokenBalance(tokenAddress) {
+   //    try {
+   //       const provider = new ethers.BrowserProvider(window.ethereum);
+   //       const contract = new ethers.Contract(
+   //          tokenAddress,
+   //          ['function balanceOf(address) view returns (uint256)'],
+   //          provider
+   //       );
+
+   //       // Call balanceOf function to get the balance
+   //       const balance = await contract.balanceOf(address);
+   //       return balance.toString();
+   //    } catch (error) {
+   //       console.error(
+   //          `Error fetching balance for token ${tokenAddress}:`,
+   //          error
+   //       );
+   //       throw error;
+   //    }
+   // }
+
+   // // Display balances
+   // async function DisplayBalances() {
+   //    try {
+   //       const provider = new ethers.BrowserProvider(window.ethereum);
+
+   //       // Fetch balances for USDC and WETH
+   //       const usdcBalance = await GetTokenBalance(usdcAddress);
+   //       const wethBalance = await GetTokenBalance(wethAddress);
+
+   //       // Display balances
+   //       // console.log(
+   //       //    `USDC Balance: ${ethers.utils.formatUnits(usdcBalance.toString())}`
+   //       // );
+   //       console.log(`WETH Balance: ${usdcBalance}`);
+   //       console.log(`WETH Balance: ${ethers.formatEther(wethBalance)}`);
+   //    } catch (error) {
+   //       console.error('Error displaying balances:', error);
+   //    }
+   // }
+
+   // Execute the function to display balances
+   // DisplayBalances();
+
    const [userInput, setUserInput] = useState('');
    const [result, setResult] = useState('');
    const [initialized, setInitialized] = useState(false);
@@ -23,11 +156,19 @@ const RubicIntJs = () => {
    const [selectedOutputToken, setSelectedOutputToken] = useState(null);
    const [tokensSwitched, setTokensSwitched] = useState(false);
    const [isLoading, setIsLoading] = useState(false);
+
    // const [tradeTypes, setTradeTypes] = useState(null);
    // const [tradeTypePrices, setTradeTypePrices] = useState(null);
    // const [tradeAmounts, setTradeAmounts] = useState(null);
+
    const [tradesData, setTradesData] = useState(null);
    const [onChainTradeData, setOnChainTradeData] = useState([]);
+   const [actualPriceForOne, setActualPriceForOne] = useState(null);
+   const [onChainTradeDataAndBalance, setOnChainTradeDataAndBalance] = useState(
+      []
+   );
+   const [selectedInputTokenBalance, setSelectedInputTokenBalance] =
+      useState(null);
 
    const openModal = (tokenType) => {
       setSelectedTokenType(tokenType);
@@ -59,15 +200,97 @@ const RubicIntJs = () => {
       fetchOnChainTradeData();
    }, []);
 
+   // Fetch the balance of a token for the connected account
+   async function GetTokenBalance(tokenAddress) {
+      try {
+         const provider = new ethers.BrowserProvider(window.ethereum);
+         const contract = new ethers.Contract(
+            tokenAddress,
+            ['function balanceOf(address) view returns (uint256)'],
+            provider
+         );
+
+         // Call balanceOf function to get the balance
+         const balance = await contract.balanceOf(address);
+         const formatBalance = ethers.formatEther(balance);
+         return balance.toString();
+      } catch (error) {
+         console.error(
+            `Error fetching balance for token ${tokenAddress}:`,
+            error
+         );
+         throw error;
+      }
+   }
+
+   // Display balances
+   const DisplayBalances = useCallback(async () => {
+      try {
+         // console.log(onChainTradeData);
+
+         // Fetch balances for each token in onChainTradeData
+         const balances = await Promise.all(
+            onChainTradeData.map(async (token) => {
+               const tokenBalance = await GetTokenBalance(token.token);
+               // console.log(tokenBalance);
+               return { ...token, balance: tokenBalance };
+            })
+         );
+         // console.log('Balances:', balances);
+         setOnChainTradeDataAndBalance(balances);
+
+         // Find the balance of the selected input token
+         const selectedInputTokenBalance = balances.find(
+            (token) => token.token === selectedInputToken?.token
+         )?.balance;
+         setSelectedInputTokenBalance(selectedInputTokenBalance);
+
+         // console.log(
+         //    `Selected Input Token Balance: ${selectedInputTokenBalance}`
+         // );
+      } catch (error) {
+         console.error('Error displaying balances:', error);
+      }
+   }, [GetTokenBalance, onChainTradeData]);
+   // DisplayBalances();
+
+   useEffect(() => {
+      async function fetchData() {
+         try {
+            await DisplayBalances();
+            // Do something with balances
+         } catch (error) {
+            console.error('Error fetching and displaying balances:', error);
+         }
+      }
+
+      fetchData();
+   }, [DisplayBalances]);
+
+   // // Execute the function to display balances
+   // useEffect(() => {
+   //    async function fetchData() {
+   //       try {
+   //          const balances = await DisplayBalances();
+   //          console.log(balances);
+   //          // Do something with balances
+   //       } catch (error) {
+   //          console.error('Error fetching and displaying balances:', error);
+   //       }
+   //    }
+
+   //    fetchData();
+   // }, []);
+
    const initializeRubicSDK = useCallback(async () => {
       const config = {
          rpcProviders: {
-            [BLOCKCHAIN_NAME.ETHEREUM]: {
-               rpcList: [
-                  'https://eth-mainnet.g.alchemy.com/v2/sDAtk9cAWj4JFp6-i9VI-TZQ1YKJWilz',
-               ],
-               //    rpcList: [],
-            },
+            // [BLOCKCHAIN_NAME.ETHEREUM]: {
+            //    rpcList: [
+            //       'https://eth-mainnet.g.alchemy.com/v2/sDAtk9cAWj4JFp6-i9VI-TZQ1YKJWilz',
+            //    ],
+            //    //    rpcList: [],
+            // },
             // [BLOCKCHAIN_NAME.BINANCE_SMART_CHAIN]: {
             //    rpcList: ['https://bsc-dataseed.binance.org/'],
             //    //    rpcList: [],
@@ -78,9 +301,11 @@ const RubicIntJs = () => {
             // [BLOCKCHAIN_NAME.SOLANA]: {
             //    rpcList: ['https://api.mainnet-beta.solana.com'],
             // },
-            // [BLOCKCHAIN_NAME.NEAR]: {
-            //    rpcList: ['https://rpc.mainnet.near.org'],
-            // },
+            [BLOCKCHAIN_NAME.GOERLI]: {
+               rpcList: [
+                  'https://eth-goerli.g.alchemy.com/v2/yl554fd8p2xFr3naNTl0LfsyoxA-lidx',
+               ],
+            },
             // [BLOCKCHAIN_NAME.BITCOIN]: {
             //    rpcList: ['https://mainnet.bitcoin.org'],
             // },
@@ -278,10 +503,10 @@ const RubicIntJs = () => {
    const handleTokenSelect = useCallback(
       async (selectedToken) => {
          setIsLoading(true);
-
          try {
             const sdk = await initializeRubicSDK();
-            const blockchain = BLOCKCHAIN_NAME.ETHEREUM;
+            // const blockchain = BLOCKCHAIN_NAME.ETHEREUM;
+            const blockchain = BLOCKCHAIN_NAME.GOERLI;
 
             let fromTokenAddress = '';
             let toTokenAddress = '';
@@ -312,12 +537,13 @@ const RubicIntJs = () => {
                   fromAmount,
                   toTokenAddress
                );
+               // console.log(trades);
 
                const tradesData = trades.map((trade) => ({
                   type: trade.type,
                   amount:
                      trade.to && trade.to.tokenAmount
-                        ? trade.to.tokenAmount.toFormat(7)
+                        ? trade.to.tokenAmount.toFormat(10)
                         : 'N/A',
                }));
 
@@ -325,7 +551,14 @@ const RubicIntJs = () => {
 
                trades.forEach((trade) => {
                   if (trade && trade.to && trade.to.tokenAmount) {
-                     setResult(`${trade.to.tokenAmount.toFormat(7)}`);
+                     // Calculate the rate
+                     const rate = trade.to.tokenAmount / userInput;
+
+                     // Calculate the result when the input amount is 1
+                     const resultForOne = rate * 1;
+                     setActualPriceForOne(resultForOne);
+
+                     setResult(`${trade.to.tokenAmount.toFormat(10)}`);
                      setIsLoading(false);
                   } else if (trade) {
                      console.log(`error: ${trade.error}`);
@@ -348,18 +581,55 @@ const RubicIntJs = () => {
    useEffect(() => {
       // Check if both input and output tokens are selected and user input is provided
       if (selectedInputToken && selectedOutputToken && userInput !== '') {
-         console.log('run');
+         // console.log('run');
 
-         console.log({ selectedInputToken, selectedOutputToken, userInput });
+         // console.log({ selectedInputToken, selectedOutputToken, userInput });
          handleTokenSelect(selectedOutputToken);
       }
    }, [selectedOutputToken, selectedInputToken, userInput, handleTokenSelect]);
 
-   // console.log(tradeTypes);
-
    // This function is triggered when the "Swap" button is clicked
-   const handleSwapButtonClick = () => {
-      setInitialized(true);
+   const handleSwapButtonClick = async () => {
+      // setInitialized(true);
+      try {
+         // const fromAmount1 = ethers.parseUnits(userInput, 'ether'); // Convert user input to Wei
+         if (window.ethereum) {
+            const fromAmount = parseFloat(userInput);
+
+            console.log(fromAmount);
+            // console.log(fromAmount1);
+            const amountOutMin = 0; // Set the minimum acceptable amount of the output token
+            const path = [selectedInputToken.token, selectedOutputToken.token]; // An array of token addresses representing the swap path
+            const to = address; // The address that will receive the output tokens
+            const deadline = Math.floor(Date.now() / 1000) + 60 * 10; // Deadline for the transaction (10 minutes from now)
+
+            // const provider = new ethers.BrowserProvider(window.ethereum);
+            const provider = new ethers.AlchemyProvider(
+               'https://eth-goerli.g.alchemy.com/v2/yl554fd8p2xFr3naNTl0LfsyoxA-lidx'
+            );
+
+            const signer = provider.getSigner();
+
+            const contractInstance = new ethers.Contract(
+               '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
+               swapAbi,
+               signer
+            );
+            const tx = await contractInstance.swapExactTokensForTokens(
+               fromAmount,
+               amountOutMin,
+               path,
+               to,
+               deadline
+            );
+            const receipt = await tx.wait();
+            console.log(receipt);
+         } else {
+            console.error('MetaMask or Ethereum provider not detected');
+         }
+      } catch (err) {
+         console.error(err);
+      }
    };
 
    const handleTokenSwitch = () => {
@@ -427,20 +697,42 @@ const RubicIntJs = () => {
                      </div>
                      <div className="space-y-0.5 relative">
                         <div className="flex justify-between  items-center py-3 px-2 rounded-t-2xl bg-[#222331]">
-                           <div className="mb-4">
-                              <button
-                                 className="w-full py-2 px-4  text-gray-300 rounded-2xl bg-[#3b3d4f] "
-                                 onClick={() => openModal('input')}
-                                 // value={inputToken}
-                                 // onChange={(e) => setInputToken(e.target.value)}
-                              >
-                                 {selectedInputToken
-                                    ? selectedInputToken.symbol
-                                    : 'Select Token'}
-                              </button>
+                           <div className="">
+                              <div className="mb-1">
+                                 <button
+                                    className=" py-2 px-4  text-gray-300 rounded-2xl bg-[#3b3d4f] "
+                                    onClick={() => openModal('input')}
+                                    // value={inputToken}
+                                    // onChange={(e) => setInputToken(e.target.value)}
+                                 >
+                                    {selectedInputToken
+                                       ? selectedInputToken.symbol
+                                       : 'Select Token'}
+                                 </button>
+                              </div>
+                              <div className="">
+                                 {selectedInputToken ? (
+                                    <div>
+                                       <span className="text-xs text-gray-400 pr-2">
+                                          You have {selectedInputTokenBalance}
+                                       </span>
+                                       <button
+                                          onClick={() =>
+                                             setUserInput(
+                                                selectedInputTokenBalance
+                                             )
+                                          }
+                                          className="text-sm text-blue-500"
+                                       >
+                                          MAX
+                                       </button>
+                                    </div>
+                                 ) : (
+                                    ''
+                                 )}
+                              </div>
                            </div>
-
-                           <div className="mb-4">
+                           <div className="mb-2">
                               <input
                                  type="number"
                                  id="inputAmount"
@@ -475,7 +767,7 @@ const RubicIntJs = () => {
                            </button>
                         </div>
                         <div className="flex justify-between  items-center py-3 px-2 rounded-b-2xl bg-[#222331]">
-                           <div className="mb-4">
+                           <div className="mb-2">
                               <button
                                  className="w-full py-2 px-4   text-gray-300 rounded-2xl bg-[#3b3d4f]"
                                  onClick={() => openModal('output')}
@@ -485,32 +777,38 @@ const RubicIntJs = () => {
                                  {selectedOutputToken
                                     ? selectedOutputToken.symbol
                                     : 'Select Token'}
+                                 {/* <span>{selectedOutputToken.balance}</span> */}
                               </button>
                            </div>
                            {userInput &&
                               selectedOutputToken &&
                               selectedInputToken && (
                                  <div className="flex flex-col">
-                                    <span className="text-gray-300 text-end">
+                                    <span className="text-gray-300 text-sm text-end">
                                        {isLoading ? 'Calculating...' : result}
                                     </span>
-                                    {/* <span className="text-gray-500">
-                                 {isLoading
-                                    ? 'Please wait...'
-                                    : `1 ${selectedInputToken.symbol} = ${
-                                         isLoading ? '...' : result
-                                      } ${selectedOutputToken.symbol}`}
-                              </span> */}
+                                    {/* <span className="text-white">
+                                       {actualPriceForOne}
+                                    </span> */}
+                                    <span className="text-gray-500 text-xs">
+                                       {isLoading
+                                          ? 'Please wait...'
+                                          : `1 ${selectedInputToken.symbol} = ${
+                                               isLoading
+                                                  ? '...'
+                                                  : actualPriceForOne
+                                            } ${selectedOutputToken.symbol}`}
+                                    </span>
                                  </div>
                               )}
                         </div>
                      </div>
-                     <div className="flex justify-center items-center my-2 rounded-md bg-blue-500 hover:bg-blue-700">
+                     <div className="flex justify-center items-center my-2 rounded-md bg-blue-500 hover:bg-blue-700 cursor-pointer">
                         <button
                            className=" text-white py-2 px-4 rounded "
                            onClick={handleSwapButtonClick}
                         >
-                           Preview Swap
+                           Swap
                         </button>
                      </div>
                   </div>
@@ -559,24 +857,10 @@ const RubicIntJs = () => {
             isOpen={isModalOpen}
             isClose={closeModal}
             onTokenSelect={(selectedToken) => handleTokenSelect(selectedToken)}
-            tokens={onChainTradeData}
+            tokens={onChainTradeDataAndBalance}
          />
       </>
    );
 };
 
 export default RubicIntJs;
-
-// // Effect to handle token selection
-// useEffect(() => {
-//    // Check if both input and output tokens are selected and user input is provided
-//    if (selectedInputToken && selectedOutputToken && userInput !== '') {
-//       // Check if initialized is true and handleTokenSelect has not been called after switching
-//       if (initialized && !tokensSwitched) {
-//          // Call handleTokenSelect after switching
-//          handleTokenSelect();
-//          // Set tokensSwitched to true to avoid calling handleTokenSelect multiple times
-//          setTokensSwitched(true);
-//       }
-//    }
-// }, [selectedInputToken, selectedOutputToken, userInput, handleTokenSelect, initialized, tokensSwitched]);
