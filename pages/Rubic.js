@@ -7,17 +7,23 @@ import {
    Configuration,
    WalletProvider,
    CHAIN_TYPE,
+   OnChainTrade,
 } from 'rubic-sdk';
 import axios from 'axios';
-import { useAccount, useBalance, useToken } from 'wagmi';
+import { useAccount, useBalance, useConnect, useToken } from 'wagmi';
 import { ethers } from 'ethers';
 import { formatEther } from 'ethers';
 import { parseUnits } from 'ethers';
 import swapAbi from '@/Contract/swapAbi.json';
 import Exploring from '@/components/Exploring';
+import { InstantTrade } from 'rubic-sdk';
+import RubicWidget from '@/components/RubicWidget';
+import SignMessage from '@/components/Sign';
 
 const RubicIntJs = () => {
-   const { address } = useAccount();
+   const { address, account } = useAccount();
+   // Use the useConnect hook to get the connect function
+   const { connect } = useConnect();
 
    // console.log(address);
 
@@ -97,6 +103,7 @@ const RubicIntJs = () => {
    // }, [address]);
 
    // Define the contract addresses for USDC and WETH on Goerli
+
    const usdcAddress = '0x07865c6E87B9F70255377e024ace6630C1Eaa37F';
    const wethAddress = '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6';
 
@@ -170,6 +177,74 @@ const RubicIntJs = () => {
    );
    const [selectedInputTokenBalance, setSelectedInputTokenBalance] =
       useState(null);
+   const [swapTrade, setSwapTrade] = useState([]);
+
+   const [accounts, setAccounts] = useState();
+   const [rubicSDK, setRubicSDK] = useState(null);
+
+   const [config, setConfig] = useState({
+      rpcProviders: {
+         [BLOCKCHAIN_NAME.GOERLI]: {
+            rpcList: [
+               'https://eth-goerli.g.alchemy.com/v2/yl554fd8p2xFr3naNTl0LfsyoxA-lidx',
+            ],
+         },
+      },
+      walletProvider:
+         typeof window !== 'undefined'
+            ? {
+                 core: window.ethereum,
+                 address: address,
+                 chainId: 5,
+              }
+            : undefined,
+   });
+
+   useEffect(() => {
+      if (address && typeof window !== 'undefined') {
+         console.log('Wallet connected:', address); // Add this line
+         setConfig((prevConfig) => ({
+            ...prevConfig,
+            walletProvider: {
+               core: window.ethereum,
+               address: address,
+               chainId: 5, // Replace with actual chainId
+            },
+         }));
+      }
+   }, [address]);
+
+   const initializeRubicSDK = useCallback(async () => {
+      try {
+         const sdk = await SDK.createSDK(config);
+         setRubicSDK(sdk); // Store the Rubic SDK instance
+         return sdk;
+      } catch (error) {
+         console.error('Error initializing Rubic SDK:', error);
+         throw error;
+      }
+   }, [config]);
+
+   useEffect(() => {
+      if (address && typeof window !== 'undefined' && rubicSDK) {
+         // Create a new configuration object
+         const newConfig = {
+            rpcProviders: {
+               [BLOCKCHAIN_NAME.GOERLI]: {
+                  rpcList: [
+                     'https://eth-goerli.g.alchemy.com/v2/yl554fd8p2xFr3naNTl0LfsyoxA-lidx',
+                  ],
+               },
+            },
+            walletProvider: {
+               core: window.ethereum,
+               address: address,
+               chainId: 5, // Replace with actual chainId
+            },
+         };
+         rubicSDK.updateConfiguration(newConfig);
+      }
+   }, [address, rubicSDK]);
 
    const openModal = (tokenType) => {
       setSelectedTokenType(tokenType);
@@ -270,64 +345,65 @@ const RubicIntJs = () => {
       fetchData();
    }, [DisplayBalances]);
 
-   // // Execute the function to display balances
-   // useEffect(() => {
-   //    async function fetchData() {
-   //       try {
-   //          const balances = await DisplayBalances();
-   //          console.log(balances);
-   //          // Do something with balances
-   //       } catch (error) {
-   //          console.error('Error fetching and displaying balances:', error);
-   //       }
-   //    }
-
-   //    fetchData();
-   // }, []);
-
-   const initializeRubicSDK = useCallback(async () => {
-      const config = {
-         rpcProviders: {
-            // [BLOCKCHAIN_NAME.ETHEREUM]: {
-            //    rpcList: [
-            //       'https://eth-mainnet.g.alchemy.com/v2/sDAtk9cAWj4JFp6-i9VI-TZQ1YKJWilz',
-            //    ],
-            //    //    rpcList: [],
-            // },
-            // [BLOCKCHAIN_NAME.BINANCE_SMART_CHAIN]: {
-            //    rpcList: ['https://bsc-dataseed.binance.org/'],
-            //    //    rpcList: [],
-            // },
-            // [BLOCKCHAIN_NAME.POLYGON]: {
-            //    rpcList: ['https://polygon-rpc.com'],
-            // },
-            // [BLOCKCHAIN_NAME.SOLANA]: {
-            //    rpcList: ['https://api.mainnet-beta.solana.com'],
-            // },
-            [BLOCKCHAIN_NAME.GOERLI]: {
-               rpcList: [
-                  'https://eth-goerli.g.alchemy.com/v2/yl554fd8p2xFr3naNTl0LfsyoxA-lidx',
-               ],
-            },
-            // [BLOCKCHAIN_NAME.BITCOIN]: {
-            //    rpcList: ['https://mainnet.bitcoin.org'],
-            // },
-         },
-      };
-
-      // console.log(config);
-      // console.log(BLOCKCHAIN_NAME);
-
-      try {
-         const sdk = await SDK.createSDK(config);
-         // console.log('Rubic SDK initialized:', sdk.onChainManager);
-
-         return sdk;
-      } catch (error) {
-         console.error('Error initializing Rubic SDK:', error);
-         throw error; // Rethrow the error to handle it in the calling code
+   // Execute the function to display balances
+   useEffect(() => {
+      async function fetchData() {
+         try {
+            const balances = await DisplayBalances();
+            // console.log(balances);
+            // Do something with balances
+         } catch (error) {
+            console.error('Error fetching and displaying balances:', error);
+         }
       }
+
+      fetchData();
    }, []);
+
+   // const initializeRubicSDK = useCallback(async () => {
+   //    const config = {
+   //       rpcProviders: {
+   //          // [BLOCKCHAIN_NAME.ETHEREUM]: {
+   //          //    rpcList: [
+   //          //       'https://eth-mainnet.g.alchemy.com/v2/sDAtk9cAWj4JFp6-i9VI-TZQ1YKJWilz',
+   //          //    ],
+   //          //    //    rpcList: [],
+   //          // },
+   //          // [BLOCKCHAIN_NAME.BINANCE_SMART_CHAIN]: {
+   //          //    rpcList: ['https://bsc-dataseed.binance.org/'],
+   //          //    //    rpcList: [],
+   //          // },
+   //          // [BLOCKCHAIN_NAME.POLYGON]: {
+   //          //    rpcList: ['https://polygon-rpc.com'],
+   //          // },
+   //          // [BLOCKCHAIN_NAME.SOLANA]: {
+   //          //    rpcList: ['https://api.mainnet-beta.solana.com'],
+   //          // },
+   //          [BLOCKCHAIN_NAME.GOERLI]: {
+   //             rpcList: [
+   //                'https://eth-goerli.g.alchemy.com/v2/yl554fd8p2xFr3naNTl0LfsyoxA-lidx',
+   //             ],
+   //          },
+   //          // [BLOCKCHAIN_NAME.BITCOIN]: {
+   //          //    rpcList: ['https://mainnet.bitcoin.org'],
+   //          // },
+   //       },
+   //       wallet: window.ethereum,
+   //    };
+
+   //    // console.log(config);
+   //    // console.log(BLOCKCHAIN_NAME);
+
+   //    try {
+   //       const sdk = await SDK.createSDK(config);
+   //       // console.log('Rubic SDK initialized:', sdk.onChainManager);
+
+   //       return sdk;
+   //    } catch (error) {
+   //       console.error('Error initializing Rubic SDK:', error);
+   //       throw error; // Rethrow the error to handle it in the calling code
+   //    }
+   // }, []);
 
    useEffect(() => {
       const fetchData = async () => {
@@ -540,7 +616,8 @@ const RubicIntJs = () => {
                   fromAmount,
                   toTokenAddress
                );
-               // console.log(trades);
+
+               setSwapTrade(trades);
 
                const tradesData = trades.map((trade) => ({
                   type: trade.type,
@@ -552,8 +629,11 @@ const RubicIntJs = () => {
 
                setTradesData(tradesData);
 
+               const bestTrade = trades[1];
+
                trades.forEach((trade) => {
-                  if (trade && trade.to && trade.to.tokenAmount) {
+                  // if (trade && trade.to && trade.to.tokenAmount) {
+                  if (trade instanceof OnChainTrade) {
                      // Calculate the rate
                      const rate = trade.to.tokenAmount / userInput;
 
@@ -567,9 +647,14 @@ const RubicIntJs = () => {
                      console.log(`error: ${trade.error}`);
                   }
                });
+
+               // console.log('Selected trade:', bestTrade);
+               // const onConfirm = (hash) => console.log(hash);
+               // const transactionHash = await bestTrade.swap({ onConfirm });
+               // console.log('Selected trade:', transactionHash);
             }
          } catch (error) {
-            console.error('Error handling user input:', error);
+            console.error('Error handling user :', error);
          }
       },
       [
@@ -674,52 +759,85 @@ const RubicIntJs = () => {
       }
    };
 
+   // const handleSwapButtonClick = async () => {
+   //    try {
+   //       const sdk = await initializeRubicSDK();
+   //       const blockchain = BLOCKCHAIN_NAME.GOERLI;
+   //       console.log();
+
+   //       let fromTokenAddress = selectedInputToken?.token;
+   //       let toTokenAddress = selectedOutputToken?.token;
+   //       const fromAmount = parseFloat(userInput);
+
+   //       console.log({ fromTokenAddress, toTokenAddress, fromAmount });
+
+   //       if (!fromTokenAddress || !toTokenAddress || !fromAmount) {
+   //          throw new Error('Make sure all the conditions are met');
+   //       }
+
+   //       const trades = await sdk.onChainManager.calculateTrade(
+   //          { blockchain, address: fromTokenAddress },
+   //          fromAmount,
+   //          toTokenAddress
+   //       );
+
+   //       console.log(trades);
+
+   //       const bestTrade = trades[1] instanceof InstantTrade && trades[1];
+
+   //       if (!bestTrade) {
+   //          throw new Error('No valid trade found');
+   //       }
+
+   //       const onConfirm = (hash) => console.log(hash);
+   //       const receipt = await bestTrade.swap({ onConfirm });
+
+   //       console.log('Swap successful:', receipt);
+   //    } catch (error) {
+   //       console.error('Error handling swap:', error);
+   //    }
+   // };
+
    const handleSwapButtonClick = async () => {
-      // setInitialized(true);
-
       try {
-         // if (!window.ethereum || !window.ethereum.isConnected()) {
-         //    console.error(
-         //       'Please connect to MetaMask or another Ethereum wallet.'
-         //    );
-         //    return;
-         // }
+         if (!address) {
+            throw new Error('Wallet is not connected');
+         }
+         const sdk = await initializeRubicSDK();
 
-         const fromAmount = ethers.utils.parseUnits(userInput, 'ether');
-         const provider = new ethers.providers.Web3Provider(window.ethereum);
-         const signer = provider.getSigner();
+         const blockchain = BLOCKCHAIN_NAME.GOERLI;
+         // const blockchain = BLOCKCHAIN_NAME.ETHEREUM;
 
-         const contractInstance = new ethers.Contract(
-            '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
-            swapAbi,
-            signer
-         );
+         let fromTokenAddress = selectedInputToken?.token;
+         let toTokenAddress = selectedOutputToken?.token;
+         const fromAmount = parseFloat(userInput);
 
-         const amountOutMin = 0;
-         const path = [selectedInputToken.token, selectedOutputToken.token];
-         const to = address; // Assuming 'address' is the user's wallet address
-         const deadline = Math.floor(Date.now() / 1000) + 60 * 10;
+         if (!fromTokenAddress || !toTokenAddress || !fromAmount) {
+            throw new Error('Make sure all the conditions are met');
+         }
 
-         const tx = await contractInstance.swapExactTokensForTokens(
+         const trades = await sdk.onChainManager.calculateTrade(
+            { blockchain, address: fromTokenAddress },
             fromAmount,
-            amountOutMin,
-            path,
-            to,
-            deadline,
-            {
-               gasLimit: 600000,
-               gasPrice: ethers.utils.parseUnits('10.0', 'gwei'),
-            }
+            toTokenAddress
          );
 
-         const receipt = await tx.wait();
+         const bestTrade = trades[1];
+         console.log(bestTrade);
 
-         console.log(receipt);
-      } catch (err) {
-         console.error('Error executing swap:', err);
+         if (!bestTrade) {
+            throw new Error('No valid trade found');
+         }
+
+         const onConfirm = (hash) => console.log(hash);
+         const transactionHash = await bestTrade.swap({ onConfirm });
+         console.log(transactionHash);
+
+         console.log('Swap successful:', transactionHash);
+      } catch (error) {
+         console.error('Error handling swap:', error);
       }
    };
-
    const handleTokenSwitch = () => {
       if (selectedInputToken && selectedOutputToken) {
          // Swap input and output tokens
@@ -772,11 +890,37 @@ const RubicIntJs = () => {
    // console.log(selectedInputToken);
    // console.log(selectedOutputToken);
 
+   const connectWallet = async () => {
+      try {
+         if (typeof window.ethereum !== 'undefined') {
+            const accounts = await window.ethereum.request({
+               method: 'eth_requestAccounts',
+            });
+            const account = accounts[0];
+
+            setAccounts(account);
+
+            console.log(account, 'MetaMask is installed!');
+         }
+      } catch (error) {
+         console.error('Error connecting to wallet:', error);
+      }
+   };
+
    return (
       <>
          <div className="mx-auto mt-12">
+            <div id="rubic-widget-root"></div>
+
             <div className=" m-auto grid max-w-md grid-cols-1 gap-8 lg:max-w-4xl lg:grid-cols-2 ">
                {/* RIGHT SIDE */}
+               {/* <button
+                  className="text-white py-2 px-4 rounded"
+                  onClick={connectWallet}
+               >
+                  Connect Wallet
+               </button> */}
+               {/* <SignMessage /> */}
                <div>
                   <div className=" p-4 rounded-2xl shadow-2xl bg-[#3b3d4f]">
                      <div className="flex py-3">
@@ -950,6 +1094,7 @@ const RubicIntJs = () => {
                )}
             </div>
             {/* <Exploring /> */}
+            <RubicWidget />
          </div>
          <Modal
             isOpen={isModalOpen}
@@ -962,3 +1107,16 @@ const RubicIntJs = () => {
 };
 
 export default RubicIntJs;
+
+// Add this to your component's JSX
+{
+   /* <button
+   className="text-white py-2 px-4 rounded"
+   onClick={isWalletConnected ? handleSwapButtonClick : connectWallet}
+   disabled={isWalletConnected && (!selectedInputToken || !selectedOutputToken || !userInput)}
+>
+   {isWalletConnected ? 'Swap' : 'Connect Wallet'}
+</button> */
+}
+
+// In your case, you can use instantTrade.encode() function to get encoded data of transaction. After that you can send transaction through web3 (or anything) using private key and encoded data.

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 // import RubicInt from '@/RubicInt';
 import RubicIntJs from '@/pages/Rubic';
+import RubicWidget from '@/components/RubicWidget';
 
 export default function Home() {
    useEffect(() => {
@@ -53,7 +54,7 @@ export default function Home() {
             </div>
          </div>
          <div>
-            {/* <RubicInt /> */}
+            <RubicWidget />
             <RubicIntJs />
          </div>
          <div id="rubic-widget-root"></div>

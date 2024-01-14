@@ -36,10 +36,6 @@ createWeb3Modal({ wagmiConfig, projectId, chains });
 export default function App({ Component, pageProps }: AppProps) {
    return (
       <>
-         <Script
-            type="text/javascript"
-            src="https://widgets.rubic.exchange/iframe/bundle.new-app.min.js"
-         ></Script>
          <WagmiConfig config={wagmiConfig}>
             <Component {...pageProps} />
          </WagmiConfig>
