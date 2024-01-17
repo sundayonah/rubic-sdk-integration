@@ -1,0 +1,419 @@
+[
+   {
+      "inputs": [
+         { "internalType": "address", "name": "_token", "type": "address" },
+         {
+            "internalType": "address",
+            "name": "_secretSigner",
+            "type": "address"
+         }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+   },
+   {
+      "anonymous": false,
+      "inputs": [
+         {
+            "indexed": true,
+            "internalType": "address",
+            "name": "player",
+            "type": "address"
+         },
+         {
+            "indexed": true,
+            "internalType": "uint256",
+            "name": "gameId",
+            "type": "uint256"
+         },
+         {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+         }
+      ],
+      "name": "BetPlaced",
+      "type": "event"
+   },
+   {
+      "anonymous": false,
+      "inputs": [
+         {
+            "indexed": true,
+            "internalType": "uint256",
+            "name": "gameId",
+            "type": "uint256"
+         },
+         {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "minimumBet",
+            "type": "uint256"
+         },
+         {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "minimumPlayer",
+            "type": "uint256"
+         }
+      ],
+      "name": "GameInfoSet",
+      "type": "event"
+   },
+   {
+      "anonymous": false,
+      "inputs": [
+         {
+            "indexed": true,
+            "internalType": "address",
+            "name": "player",
+            "type": "address"
+         },
+         {
+            "indexed": true,
+            "internalType": "uint256",
+            "name": "gameId",
+            "type": "uint256"
+         },
+         {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+         }
+      ],
+      "name": "JoinGame",
+      "type": "event"
+   },
+   {
+      "anonymous": false,
+      "inputs": [
+         {
+            "indexed": true,
+            "internalType": "address",
+            "name": "player",
+            "type": "address"
+         },
+         {
+            "indexed": true,
+            "internalType": "uint256",
+            "name": "gameId",
+            "type": "uint256"
+         },
+         {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+         }
+      ],
+      "name": "LeaveGame",
+      "type": "event"
+   },
+   {
+      "anonymous": false,
+      "inputs": [
+         {
+            "indexed": true,
+            "internalType": "address",
+            "name": "previousOwner",
+            "type": "address"
+         },
+         {
+            "indexed": true,
+            "internalType": "address",
+            "name": "newOwner",
+            "type": "address"
+         }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+   },
+   {
+      "anonymous": false,
+      "inputs": [
+         {
+            "indexed": false,
+            "internalType": "address",
+            "name": "account",
+            "type": "address"
+         }
+      ],
+      "name": "Paused",
+      "type": "event"
+   },
+   {
+      "anonymous": false,
+      "inputs": [
+         {
+            "indexed": false,
+            "internalType": "address",
+            "name": "account",
+            "type": "address"
+         }
+      ],
+      "name": "Unpaused",
+      "type": "event"
+   },
+   {
+      "inputs": [],
+      "name": "DENOMINATOR",
+      "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+      "stateMutability": "view",
+      "type": "function"
+   },
+   {
+      "inputs": [
+         { "internalType": "uint256", "name": "_gameId", "type": "uint256" },
+         {
+            "internalType": "uint256",
+            "name": "_minimumBet",
+            "type": "uint256"
+         },
+         {
+            "internalType": "uint256",
+            "name": "_minimumPlayer",
+            "type": "uint256"
+         },
+         { "internalType": "uint256", "name": "_startTime", "type": "uint256" }
+      ],
+      "name": "addGameInfo",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+   },
+   {
+      "inputs": [],
+      "name": "feeConfig",
+      "outputs": [
+         {
+            "internalType": "uint256",
+            "name": "protocolFeePercent",
+            "type": "uint256"
+         },
+         {
+            "internalType": "uint256",
+            "name": "firstLevelPercent",
+            "type": "uint256"
+         },
+         {
+            "internalType": "uint256",
+            "name": "secondLevelPercent",
+            "type": "uint256"
+         },
+         {
+            "internalType": "uint256",
+            "name": "thirdLevelPercent",
+            "type": "uint256"
+         }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+   },
+   {
+      "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+      "name": "gameIdToIndex",
+      "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+      "stateMutability": "view",
+      "type": "function"
+   },
+   {
+      "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+      "name": "gameInfo",
+      "outputs": [
+         { "internalType": "uint256", "name": "gameId", "type": "uint256" },
+         { "internalType": "uint256", "name": "minimumBet", "type": "uint256" },
+         {
+            "internalType": "uint256",
+            "name": "minimumPlayer",
+            "type": "uint256"
+         },
+         { "internalType": "uint256", "name": "startTime", "type": "uint256" },
+         {
+            "internalType": "uint256",
+            "name": "totalAmountBet",
+            "type": "uint256"
+         }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+   },
+   {
+      "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+      "name": "isGameIdAdded",
+      "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+      "stateMutability": "view",
+      "type": "function"
+   },
+   {
+      "inputs": [
+         { "internalType": "uint256", "name": "_gameId", "type": "uint256" },
+         { "internalType": "uint256", "name": "amount", "type": "uint256" }
+      ],
+      "name": "joinGame",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+   },
+   {
+      "inputs": [
+         { "internalType": "uint256", "name": "_gameId", "type": "uint256" }
+      ],
+      "name": "leaveGame",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+   },
+   {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+      "stateMutability": "view",
+      "type": "function"
+   },
+   {
+      "inputs": [],
+      "name": "paused",
+      "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+      "stateMutability": "view",
+      "type": "function"
+   },
+   {
+      "inputs": [
+         { "internalType": "uint256", "name": "", "type": "uint256" },
+         { "internalType": "uint256", "name": "", "type": "uint256" }
+      ],
+      "name": "players",
+      "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+      "stateMutability": "view",
+      "type": "function"
+   },
+   {
+      "inputs": [],
+      "name": "protocolAddress",
+      "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+      "stateMutability": "view",
+      "type": "function"
+   },
+   {
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+   },
+   {
+      "inputs": [],
+      "name": "secretSigner",
+      "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+      "stateMutability": "view",
+      "type": "function"
+   },
+   {
+      "inputs": [
+         {
+            "internalType": "uint256",
+            "name": "_protocolFeePercent",
+            "type": "uint256"
+         },
+         {
+            "internalType": "uint256",
+            "name": "_firstLevelPercent",
+            "type": "uint256"
+         },
+         {
+            "internalType": "uint256",
+            "name": "_secondLevelPercent",
+            "type": "uint256"
+         },
+         {
+            "internalType": "uint256",
+            "name": "_thirdLevelPercent",
+            "type": "uint256"
+         }
+      ],
+      "name": "setFeeConfiguration",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+   },
+   {
+      "inputs": [
+         {
+            "internalType": "address",
+            "name": "_protocolAddress",
+            "type": "address"
+         }
+      ],
+      "name": "setProtocolAddress",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+   },
+   {
+      "inputs": [
+         { "internalType": "uint256", "name": "_gameId", "type": "uint256" },
+         {
+            "internalType": "uint256",
+            "name": "_randomNumber",
+            "type": "uint256"
+         },
+         {
+            "internalType": "address[]",
+            "name": "_players",
+            "type": "address[]"
+         },
+         { "internalType": "bytes", "name": "_signature", "type": "bytes" }
+      ],
+      "name": "settleGame",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+   },
+   {
+      "inputs": [],
+      "name": "token",
+      "outputs": [
+         { "internalType": "contract IERC20", "name": "", "type": "address" }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+   },
+   {
+      "inputs": [
+         { "internalType": "address", "name": "newOwner", "type": "address" }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+   },
+   {
+      "inputs": [
+         { "internalType": "address", "name": "", "type": "address" },
+         { "internalType": "uint256", "name": "", "type": "uint256" }
+      ],
+      "name": "userInfo",
+      "outputs": [
+         {
+            "internalType": "uint256",
+            "name": "amountPlaceForBet",
+            "type": "uint256"
+         },
+         {
+            "internalType": "uint256",
+            "name": "totalAmountWon",
+            "type": "uint256"
+         },
+         {
+            "internalType": "uint256",
+            "name": "totalAmountLost",
+            "type": "uint256"
+         },
+         { "internalType": "bool", "name": "isQualified", "type": "bool" }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+   }
+]
