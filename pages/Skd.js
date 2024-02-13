@@ -6,17 +6,17 @@ import gameAbi from '../Contract/dAppGame.json';
 
 // const RubicWidget = () => {
 //    useEffect(() => {
-//       const connectWallet = async () => {
-//          try {
-//             // Request access to the user's Ethereum accounts
-//             const accounts = await window.ethereum.request({
-//                method: 'eth_requestAccounts',
-//             });
-//             console.log('Connected:', accounts);
-//          } catch (error) {
-//             console.error('Error connecting wallet:', error.message);
-//          }
-//       };
+//       // const connectWallet = async () => {
+//       //    try {
+//       //       // Request access to the user's Ethereum accounts
+//       //       const accounts = await window.ethereum.request({
+//       //          method: 'eth_requestAccounts',
+//       //       });
+//       //       console.log('Connected:', accounts);
+//       //    } catch (error) {
+//       //       console.error('Error connecting wallet:', error.message);
+//       //    }
+//       // };
 //       // describe widget configuration
 //       const configuration = {
 //          from: '0x07865c6E87B9F70255377e024ace6630C1Eaa37F',
@@ -54,7 +54,7 @@ import gameAbi from '../Contract/dAppGame.json';
 
 //       // Connect Wallet button click handler
 //       // const connectWalletHandler = () => {
-//       connectWallet();
+//       // connectWallet();
 //       // };
 
 //       // // prevent accidental changes to the object
@@ -77,6 +77,68 @@ import gameAbi from '../Contract/dAppGame.json';
 //    //    </div>
 //    // );
 // };
+
+const RubicWidget = () => {
+   useEffect(() => {
+      const configuration = {
+         from: '0x07865c6E87B9F70255377e024ace6630C1Eaa37F',
+         to: '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6',
+         fromChain: 'GOERLI',
+         toChain: 'GOERLI',
+         // from: 'ETH',
+         // to: 'BNB',
+         // fromChain: 'BNB',
+         // toChain: 'ETH',
+
+         iframe: false,
+         hideSelectionFrom: false,
+         hideSelectionTo: false,
+         theme: 'dark',
+         background: '#293451',
+         // injectTokens: {
+         //    weth: [
+         //       '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6', // WETH on Goerli Testnet
+         //    ],
+         //    eth: ['0x3330BFb7332cA23cd071631837dC289B09C33333'],
+         //    usdc: [
+         //       '0x07865c6E87B9F70255377e024ace6630C1Eaa37F', // USDT on Goerli Testnet
+         //    ],
+         // },
+         slippagePercent: {
+            instantTrades: 17,
+            crossChain: 19,
+         },
+         chainId: 5, // Goerli Testnet chain ID
+      };
+      // console.log(configuration);
+
+      // prevent accidental changes to the object, for example, when re-creating a widget for another theme
+
+      // Connect Wallet button click handler
+      // const connectWalletHandler = () => {
+      // connectWallet();
+      // };
+
+      // // prevent accidental changes to the object
+      Object.freeze(configuration);
+      // create widget
+
+      // initialize Rubic widget
+      window.rubicWidget.init(configuration);
+      console.clear();
+
+      // cleanup function (optional)
+      return () => {
+         // Perform cleanup if needed
+      };
+   }, []); // empty dependency array ensures the effect runs only once on mount
+
+   // return (
+   //    <div>
+
+   //    </div>
+   // );
+};
 
 const SDK = () => {
    const contractAddress = '0x18c5f2E47406fa86d2A3c7be49DfB3De4b5c8FdE';
@@ -148,7 +210,7 @@ const SDK = () => {
          />
 
          {/* Other page content */}
-         {/* <RubicWidget /> */}
+         <RubicWidget />
 
          <button
             onClick={onMetamaskSignClicked}
