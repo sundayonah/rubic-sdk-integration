@@ -54,7 +54,7 @@ export default function Home() {
             </div>
          </div>
          <div>
-            <RubicWidget />
+            {/* <RubicWidget /> */}
             <RubicIntJs />
          </div>
          <div id="rubic-widget-root"></div>

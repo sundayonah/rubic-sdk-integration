@@ -184,9 +184,10 @@ const RubicIntJs = () => {
 
    const [config, setConfig] = useState({
       rpcProviders: {
-         [BLOCKCHAIN_NAME.GOERLI]: {
+         [BLOCKCHAIN_NAME.POLYGON]: {
             rpcList: [
-               'https://eth-goerli.g.alchemy.com/v2/yl554fd8p2xFr3naNTl0LfsyoxA-lidx',
+               // 'https://eth-goerli.g.alchemy.com/v2/yl554fd8p2xFr3naNTl0LfsyoxA-lidx',
+               'https://polygon-mumbai.g.alchemy.com/v2/o_O5LwKav_r5UECR-59GtRZsIqnhD0N8',
             ],
          },
       },
@@ -290,8 +291,10 @@ const RubicIntJs = () => {
 
          // Call balanceOf function to get the balance
          const balance = await contract.balanceOf(address);
+         // console.log(balance);
          const formatBalance = ethers.utils.formatEther(balance);
-         return balance.toString();
+         // console.log(formatBalance);
+         return formatBalance.toString();
       } catch (error) {
          console.error(
             `Error fetching balance for token ${tokenAddress}:`,
@@ -585,7 +588,7 @@ const RubicIntJs = () => {
          try {
             const sdk = await initializeRubicSDK();
             // const blockchain = BLOCKCHAIN_NAME.ETHEREUM;
-            const blockchain = BLOCKCHAIN_NAME.GOERLI;
+            const blockchain = BLOCKCHAIN_NAME.POLYGON;
 
             let fromTokenAddress = '';
             let toTokenAddress = '';

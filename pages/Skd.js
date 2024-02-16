@@ -24,7 +24,7 @@ import gameAbi from '../Contract/dAppGame.json';
 //          fromChain: 'GOERLI',
 //          toChain: 'GOERLI',
 //          // from: 'ETH',
-//          // to: 'BNB',
+//          // to: 'USDT',
 //          // fromChain: 'BNB',
 //          // toChain: 'ETH',
 
@@ -81,20 +81,29 @@ import gameAbi from '../Contract/dAppGame.json';
 const RubicWidget = () => {
    useEffect(() => {
       const configuration = {
-         from: '0x07865c6E87B9F70255377e024ace6630C1Eaa37F',
-         to: '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6',
-         fromChain: 'GOERLI',
-         toChain: 'GOERLI',
+         // from: '0x07865c6E87B9F70255377e024ace6630C1Eaa37F',
+         // to: '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6',
+         // fromChain: 'GOERLI',
+         // toChain: 'GOERLI',
+         /////////////////////
          // from: 'ETH',
          // to: 'BNB',
          // fromChain: 'BNB',
          // toChain: 'ETH',
 
-         iframe: false,
+         from: 'MATIC',
+         to: 'USDT',
+         fromChain: 'POLYGON',
+         toChain: 'POLYGON',
+         amount: 0.001,
+
+         // iframe: true,
          hideSelectionFrom: false,
-         hideSelectionTo: false,
+         hideSelectionTo: true,
+         tokenSearch: true,
+         rubicLink: true,
          theme: 'dark',
-         background: '#293451',
+         background: '#28372e',
          // injectTokens: {
          //    weth: [
          //       '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6', // WETH on Goerli Testnet
@@ -105,15 +114,30 @@ const RubicWidget = () => {
          //    ],
          // },
          slippagePercent: {
-            instantTrades: 17,
-            crossChain: 19,
+            instantTrades: 2,
+            crossChain: 5,
          },
-         chainId: 5, // Goerli Testnet chain ID
+         chainId: 137, // Goerli Testnet chain ID
       };
+      function onThemeChange(newTheme) {
+         // copy base dark configuration
+         const newConfiguration = { ...configuration };
+         // console.log(newConfiguration);
+
+         if (newTheme === 'light') {
+            // modify configuration for the light theme. You can change any properties
+            newConfiguration.theme = 'light';
+
+            // remove old widget and recreate new with light configuration
+            window.rubicWidget.init(configuration);
+         } else {
+            // remove old widget and recreate new with dark configuration
+            window.rubicWidget.init(configuration);
+         }
+      }
       // console.log(configuration);
 
       // prevent accidental changes to the object, for example, when re-creating a widget for another theme
-
       // Connect Wallet button click handler
       // const connectWalletHandler = () => {
       // connectWallet();
@@ -128,6 +152,7 @@ const RubicWidget = () => {
       console.clear();
 
       // cleanup function (optional)
+      onThemeChange();
       return () => {
          // Perform cleanup if needed
       };

@@ -89,20 +89,34 @@
 // GOERLI TESTNET
 
 const onChainTradeData = [
+   // {
+   //    id: 1,
+   //    token: '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6',
+   //    symbol: 'WETH',
+   //    name: '',
+   // },
+   // {
+   //    id: 2,
+   //    token: '0x07865c6E87B9F70255377e024ace6630C1Eaa37F',
+   //    symbol: 'USDC',
+   //    name: '',
+   // },
    {
-      id: 1,
-      token: '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6',
-      symbol: 'WETH',
+      id: 3,
+      token: '"0xD04254F39086545F92A3dcdaaAB45e115d9f7197"',
+      symbol: 'MATIC',
       name: '',
    },
+
    {
-      id: 2,
-      token: '0x07865c6E87B9F70255377e024ace6630C1Eaa37F',
-      symbol: 'USDC',
+      id: 4,
+      token: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
+      symbol: 'USDT',
       name: '',
    },
 ];
-
+// 0xc2132D05D31c914a87C6611C10748AEb04B58e8F
+// 0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270
 // const onChainTradeData = [
 //    {
 //       id: 1,
