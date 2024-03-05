@@ -1097,7 +1097,7 @@ const RubicIntJs = () => {
                )}
             </div>
             {/* <Exploring /> */}
-            <RubicWidget />
+            {/* <RubicWidget /> */}
          </div>
          <Modal
             isOpen={isModalOpen}
